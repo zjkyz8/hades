@@ -7,6 +7,7 @@ from __init__ import *
 class WuLiuTianXiaConnector:
     hostName = "http://www.56885.net/"
     session = requests.session()
+    # record_repo =
 
     def __init__(self):
         pass
