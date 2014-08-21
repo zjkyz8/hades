@@ -6,7 +6,7 @@ db_config = {
     'host': 'localhost',
     'user': 'root',
     'passwd': 'xxxxxxxx',
-    'db': 'test',
+    'db': 'hades',
     'charset': 'utf8'
 }
 

@@ -48,8 +48,8 @@ class WuLiuTianXiaConnector:
                     print cargo_name
                     cargo_weight = table.findAll("tr")[2].findAll("td")[1].text
                     print cargo_weight
-                    require_truck_type = table.findAll("tr")[3].findAll("td")[1].text
-                    print require_truck_type
+                    require_truck_info = table.findAll("tr")[3].findAll("td")[1].text
+                    print require_truck_info
                     city_from = table.findAll("tr")[4].findAll("td")[1].text
                     print city_from
                     city_to = table.findAll("tr")[5].findAll("td")[1].text
