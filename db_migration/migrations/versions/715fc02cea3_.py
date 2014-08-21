@@ -21,7 +21,7 @@ def upgrade():
         sa.Column('cargo_name', sa.String(255), nullable=True),
         sa.Column('cargo_weight', sa.Float(), nullable=False),
         sa.Column('cargo_status', sa.String(255), nullable=False),
-        sa.Column('cargo_detail', sa.String(65535), nullable=True),
+        sa.Column('cargo_detail', sa.Text(), nullable=True),
 
         sa.Column('date_from', sa.DateTime(), nullable=False),
         sa.Column('date_to', sa.DateTime(), nullable=False),
@@ -33,7 +33,7 @@ def upgrade():
         sa.Column('contacts', sa.String(255), nullable=False),
         sa.Column('phone_num', sa.String(20), nullable=False),
         sa.Column('publish_org', sa.String(255), nullable=True),
-        sa.Column('address', sa.String(65535), nullable=False),
+        sa.Column('address', sa.Text(), nullable=False),
 
         sa.PrimaryKeyConstraint('id')
     )
