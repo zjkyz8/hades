@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 from __init__ import *
 
 
 class WuLiuTianXiaConnector:
     hostName = "http://www.56885.net/"
     session = requests.session()
-    # record_repo =
 
     def __init__(self):
         pass
@@ -40,6 +38,7 @@ class WuLiuTianXiaConnector:
                                                 .replace(u'日', ''), '%Y %m %d')
                     if date_to < datetime.now():
                         continue
+
                     print date_from
                     print date_to
 
@@ -68,6 +67,11 @@ class WuLiuTianXiaConnector:
                     print address
                     cargo_detail = table.findAll("tr")[12].findAll("td")[1].text
                     print cargo_detail
+                    record = Record(cargo_name, cargo_weight, cargo_status, cargo_detail, date_from,
+                                    date_to, require_truck_info, city_from, city_to, pay_type, contacts, phone_num,
+                                    publish_org, address)
+                    db_session.add(record)
+                    db_session.commit()
                     print '---------------------------------'
 
 
