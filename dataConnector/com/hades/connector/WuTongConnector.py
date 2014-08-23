@@ -4,7 +4,7 @@ from __init__ import *
 
 
 class WuTongConnector:
-    hostName = "http://www.chinawutong.com/"
+    host_name = "http://www.chinawutong.com/"
 
     def __init__(self):
         self.session = requests.session()
@@ -12,7 +12,9 @@ class WuTongConnector:
 
     def get_html_content(self, url=''):
         cookies = dict(UserInfo='87898C5F064DD214197764709A9EB119BF82532EDB53FDF4')
-        request = self.session.get(self.hostName + url, cookies=cookies)
+        headers = {"User-Agent":
+                       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36"}
+        request = self.session.get(self.host_name + url, cookies=cookies, headers = headers)
 
         content = BeautifulSoup.BeautifulSoup(request.content, fromEncoding="gb18030")
         return content
