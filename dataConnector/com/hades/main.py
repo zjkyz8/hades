@@ -6,8 +6,8 @@ __author__ = 'xinhuang'
 
 init_db()
 
-# wu_liu_tian_xia_connector = WuLiuTianXiaConnector()
-# wu_liu_tian_xia_connector.fetch_data_and_save()
+wu_liu_tian_xia_connector = WuLiuTianXiaConnector()
+wu_liu_tian_xia_connector.fetch_data_and_save()
 
-wu_tong_connector = WuTongConnector()
-wu_tong_connector.fetch_data_and_save()
+# wu_tong_connector = WuTongConnector()
+# wu_tong_connector.fetch_data_and_save()

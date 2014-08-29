@@ -31,7 +31,7 @@ def upgrade():
         sa.Column('pay_type', sa.String(255), nullable=True),
 
         sa.Column('contacts', sa.String(255), nullable=False),
-        sa.Column('phone_num', sa.String(20), nullable=False),
+        sa.Column('phone_num', sa.String(100), nullable=False),
         sa.Column('publish_org', sa.String(255), nullable=True),
         sa.Column('address', sa.Text(), nullable=False),
 

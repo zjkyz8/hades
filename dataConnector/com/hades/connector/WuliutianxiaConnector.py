@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from sqlalchemy import and_
 from __init__ import *
 
 
@@ -39,39 +39,32 @@ class WuLiuTianXiaConnector:
                     if date_to < datetime.now():
                         continue
 
-                    print date_from
-                    print date_to
-
                     cargo_status = table.findAll("tr")[0].findAll("td")[1].text
-                    print cargo_status
                     cargo_name = table.findAll("tr")[1].findAll("td")[1].text
-                    print cargo_name
                     cargo_weight = table.findAll("tr")[2].findAll("td")[1].text
-                    print cargo_weight
                     require_truck_info = table.findAll("tr")[3].findAll("td")[1].text
-                    print require_truck_info
                     city_from = table.findAll("tr")[4].findAll("td")[1].text
-                    print city_from
                     city_to = table.findAll("tr")[5].findAll("td")[1].text
-                    print city_to
                     pay_type = table.findAll("tr")[6].findAll("td")[1].text
-                    print pay_type
-
                     contacts = table.findAll("tr")[8].findAll("td")[1].text
-                    print contacts
                     phone_num = table.findAll("tr")[9].findAll("td")[1].text
-                    print phone_num
+
                     publish_org = table.findAll("tr")[10].findAll("td")[1].text
-                    print publish_org
                     address = table.findAll("tr")[11].findAll("td")[1].text
-                    print address
                     cargo_detail = table.findAll("tr")[12].findAll("td")[1].text
-                    print cargo_detail
-                    record = Record(cargo_name, cargo_weight, cargo_status, cargo_detail, date_from,
+                    existing_records = Record.query.filter(and_(Record.date_from == date_from,
+                                                          Record.date_to == date_to,
+                                                          Record.cargo_status == cargo_status,
+                                                          Record.cargo_weight == cargo_weight,
+                                                          Record.city_from == city_from,
+                                                          Record.city_to == city_to,
+                                                          Record.phone_num == phone_num,
+                                                          Record.contacts == contacts)).all()
+                    print len(existing_records)
+                    if len(existing_records) == 0:
+                        print "new record created"
+                        record = Record(cargo_name, cargo_weight, cargo_status, cargo_detail, date_from,
                                     date_to, require_truck_info, city_from, city_to, pay_type, contacts, phone_num,
                                     publish_org, address)
-                    db_session.add(record)
-                    db_session.commit()
-                    print '---------------------------------'
-
-
+                        db_session.add(record)
+                        db_session.commit()
