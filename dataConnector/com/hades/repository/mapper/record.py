@@ -1,4 +1,5 @@
 from __init__ import *
+
 __author__ = 'xinhuang'
 
 
@@ -21,9 +22,11 @@ class Record(Base):
     phone_num = Column(String(20))
     publish_org = Column(String(255))
     address = Column('address', Text())
+    note = Column('note', Text())
 
-    def __init__(self, cargo_name, cargo_weight, cargo_status, cargo_detail, date_from,
-                 date_to, require_truck_info, city_from, city_to, pay_type, contacts, phone_num, publish_org, address):
+    def __init__(self, cargo_name, cargo_weight, date_from, date_to, require_truck_info,
+                 city_from, city_to, contacts, phone_num, publish_org, address, cargo_status='',
+                 cargo_detail='', pay_type='', note=''):
         self.cargo_name = cargo_name
         self.cargo_weight = cargo_weight
         self.cargo_status = cargo_status
@@ -38,3 +41,4 @@ class Record(Base):
         self.phone_num = phone_num
         self.publish_org = publish_org
         self.address = address
+        self.note = note

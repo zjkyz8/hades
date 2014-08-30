@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
+import time
 
 from __init__ import *
+
+
+def get_date_to(date_str):
+    if date_str == u'长期货源':
+        return datetime.max
+    date_to = datetime.strptime(date_str, '%Y-%m-%d')
+    return date_to
 
 
 class WuTongConnector:
@@ -19,67 +27,55 @@ class WuTongConnector:
         content = BeautifulSoup.BeautifulSoup(request.content, fromEncoding="gb18030")
         return content
 
-    def get_all_area(self):
-        content = self.get_html_content('103.html?pid=2&f=&t=&lx=&hk=&hl=')
-        all_area = content.findAll("span", {"class": "find_select_textno"})
-        all_area = all_area + content.findAll("span", {"class": "find_select_textok"})
-        return all_area
-
     def fetch_data_and_save(self):
-        page_num = 100000
+        page_num = 1
         while True:
-            content = self.get_html_content('103.html?pid=' + `page_num` + '&f=&t=&lx=&hk=&hl=')
-            error_msg = content.find("div", {
-                "style": "float:left;width:450px;color:#333333;font-size:18px;font-weight:bold"})
-            if error_msg.text == u"没有相关货源，您可查看相邻地区货源":
-                print error_msg
+            time.sleep(5)
+            page_content = self.get_html_content('103.html?pid=' + `page_num` + '&f=&t=&lx=&hk=&hl=')
+            error_msg = page_content.find("div", {
+                "id": "ctl00_cphContent_noData",
+                "style": "width:507px;height:50px;padding-top:20px;padding-left:120px;display:block;"})
+
+            if error_msg is not None:
                 break
 
-            print content
-        # all_area = self.get_all_area()
-        #
-        # for area in all_area:
-        # content = self.get_html_content(area.a["href"])
-        #     all_details = content.findAll("a", {"target": "_blank"})
-        #     for detail in all_details:
-        #         if detail.text == u"详细信息":
-        #             content = self.get_html_content(detail['href'])
-        #             table = content.findAll("table", {"bgcolor": "#fafafa"})[2]
-        #             date_range = table.findAll("tr")[7].findAll("td")[1].text.split(u'至')
-        #             date_from = datetime.strptime(date_range[0].replace(u'年', ' ').replace(u'月', ' ')
-        #                                           .replace(u'日', ''), '%Y %m %d')
-        #             date_to = datetime.strptime(date_range[1].replace(u'年', ' ').replace(u'月', ' ')
-        #                                         .replace(u'日', ''), '%Y %m %d')
-        #             if date_to < datetime.now():
-        #                 continue
-        #             print date_from
-        #             print date_to
-        #
-        #             cargo_status = table.findAll("tr")[0].findAll("td")[1].text
-        #             print cargo_status
-        #             cargo_name = table.findAll("tr")[1].findAll("td")[1].text
-        #             print cargo_name
-        #             cargo_weight = table.findAll("tr")[2].findAll("td")[1].text
-        #             print cargo_weight
-        #             require_truck_type = table.findAll("tr")[3].findAll("td")[1].text
-        #             print require_truck_type
-        #             city_from = table.findAll("tr")[4].findAll("td")[1].text
-        #             print city_from
-        #             city_to = table.findAll("tr")[5].findAll("td")[1].text
-        #             print city_to
-        #             pay_type = table.findAll("tr")[6].findAll("td")[1].text
-        #             print pay_type
-        #
-        #             contacts = table.findAll("tr")[8].findAll("td")[1].text
-        #             print contacts
-        #             phone_num = table.findAll("tr")[9].findAll("td")[1].text
-        #             print phone_num
-        #             publish_org = table.findAll("tr")[10].findAll("td")[1].text
-        #             print publish_org
-        #             address = table.findAll("tr")[11].findAll("td")[1].text
-        #             print address
-        #             cargo_detail = table.findAll("tr")[12].findAll("td")[1].text
-        #             print cargo_detail
-        #             print '---------------------------------'
+            else:
+                all_details = page_content.findAll("a", {"class": "fontsize14 fontweight"})
+                for details in all_details:
+                    page_content = self.get_html_content(details['href'])
+                    detail_content = page_content.find("table", {"class": "mt10"}).findAll("tr")
+                    date_from = datetime.today()
+                    date_to = get_date_to(detail_content[5].findAll("td")[1].text)
 
+                    if date_from > date_to:
+                        continue
 
+                    city_from = detail_content[0].findAll("td")[1].text
+                    city_to = detail_content[1].findAll("td")[1].text
+                    cargo_name = detail_content[2].findAll("td")[1].text
+                    cargo_weight = detail_content[2].findAll("td")[3].text.replace(u'吨', '').replace('(', '').replace(
+                        ')', '')
+                    require_truck_info = detail_content[4].findAll("td")[1].text
+                    contacts = detail_content[4].findAll("td")[3].text
+                    phone_num = detail_content[5].findAll("td")[3].text
+                    note = detail_content[6].findAll('td')[1].text + '\n' + detail_content[7].findAll('td')[1].text
+
+                    publish_org_content = page_content.findAll("table", {"class": "mt10"})[1].findAll("tr")
+                    publish_org = publish_org_content[0].findAll("td")[1].text
+                    address = publish_org_content[3].findAll("td")[1].text
+
+                    existing_records = Record.query.filter(and_(Record.date_to == date_to,
+                                                                Record.cargo_weight == cargo_weight,
+                                                                Record.city_from == city_from,
+                                                                Record.city_to == city_to,
+                                                                Record.phone_num == phone_num,
+                                                                Record.contacts == contacts)).all()
+                    if len(existing_records) == 0:
+                        print "new record created"
+                        record = Record(cargo_name, cargo_weight, date_from,
+                                        date_to, require_truck_info, city_from, city_to, contacts, phone_num,
+                                        publish_org, address, note)
+                        db_session.add(record)
+                        db_session.commit()
+
+            page_num += 1

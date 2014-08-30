@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import and_
 from __init__ import *
 
 
@@ -31,7 +30,8 @@ class WuLiuTianXiaConnector:
                 if detail.text == u"详细信息":
                     content = self.get_html_content(detail['href'])
                     table = content.findAll("table", {"bgcolor": "#fafafa"})[2]
-                    date_range = table.findAll("tr")[7].findAll("td")[1].text.split(u'至')
+                    all_info = table.findAll("tr")
+                    date_range = all_info[7].findAll("td")[1].text.split(u'至')
                     date_from = datetime.strptime(date_range[0].replace(u'年', ' ').replace(u'月', ' ')
                                                   .replace(u'日', ''), '%Y %m %d')
                     date_to = datetime.strptime(date_range[1].replace(u'年', ' ').replace(u'月', ' ')
@@ -39,19 +39,19 @@ class WuLiuTianXiaConnector:
                     if date_to < datetime.now():
                         continue
 
-                    cargo_status = table.findAll("tr")[0].findAll("td")[1].text
-                    cargo_name = table.findAll("tr")[1].findAll("td")[1].text
-                    cargo_weight = table.findAll("tr")[2].findAll("td")[1].text
-                    require_truck_info = table.findAll("tr")[3].findAll("td")[1].text
-                    city_from = table.findAll("tr")[4].findAll("td")[1].text
-                    city_to = table.findAll("tr")[5].findAll("td")[1].text
-                    pay_type = table.findAll("tr")[6].findAll("td")[1].text
-                    contacts = table.findAll("tr")[8].findAll("td")[1].text
-                    phone_num = table.findAll("tr")[9].findAll("td")[1].text
+                    cargo_status = all_info[0].findAll("td")[1].text
+                    cargo_name = all_info[1].findAll("td")[1].text
+                    cargo_weight = all_info[2].findAll("td")[1].text.replace('吨', '').replace('(', '').replace(')', '')
+                    require_truck_info = all_info[3].findAll("td")[1].text
+                    city_from = all_info[4].findAll("td")[1].text
+                    city_to = all_info[5].findAll("td")[1].text
+                    pay_type = all_info[6].findAll("td")[1].text
+                    contacts = all_info[8].findAll("td")[1].text
+                    phone_num = all_info[9].findAll("td")[1].text
 
-                    publish_org = table.findAll("tr")[10].findAll("td")[1].text
-                    address = table.findAll("tr")[11].findAll("td")[1].text
-                    cargo_detail = table.findAll("tr")[12].findAll("td")[1].text
+                    publish_org = all_info[10].findAll("td")[1].text
+                    address = all_info[11].findAll("td")[1].text
+                    cargo_detail = all_info[12].findAll("td")[1].text
                     existing_records = Record.query.filter(and_(Record.date_from == date_from,
                                                           Record.date_to == date_to,
                                                           Record.cargo_status == cargo_status,
@@ -60,11 +60,10 @@ class WuLiuTianXiaConnector:
                                                           Record.city_to == city_to,
                                                           Record.phone_num == phone_num,
                                                           Record.contacts == contacts)).all()
-                    print len(existing_records)
                     if len(existing_records) == 0:
                         print "new record created"
-                        record = Record(cargo_name, cargo_weight, cargo_status, cargo_detail, date_from,
-                                    date_to, require_truck_info, city_from, city_to, pay_type, contacts, phone_num,
-                                    publish_org, address)
+                        record = Record(cargo_name, cargo_weight, date_from,
+                                    date_to, require_truck_info, city_from, city_to, contacts, phone_num,
+                                    publish_org, address, cargo_status, cargo_detail, pay_type)
                         db_session.add(record)
                         db_session.commit()
