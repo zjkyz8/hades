@@ -6,7 +6,7 @@ from __init__ import *
 
 def get_date_to(date_str):
     if date_str == u'长期货源':
-        return datetime.max
+        return datetime(9999,12,31)
     date_to = datetime.strptime(date_str, '%Y-%m-%d')
     return date_to
 

@@ -41,7 +41,7 @@ class WuLiuTianXiaConnector:
 
                     cargo_status = all_info[0].findAll("td")[1].text
                     cargo_name = all_info[1].findAll("td")[1].text
-                    cargo_weight = all_info[2].findAll("td")[1].text.replace('吨', '').replace('(', '').replace(')', '')
+                    cargo_weight = all_info[2].findAll("td")[1].text.replace(u'吨', '').replace('(', '').replace(')', '').replace('T', '')
                     require_truck_info = all_info[3].findAll("td")[1].text
                     city_from = all_info[4].findAll("td")[1].text
                     city_to = all_info[5].findAll("td")[1].text
